@@ -567,7 +567,9 @@ impl GraphBuilder {
             bail!("Cannot build a graph with 0 stages");
         }
         let nstages = self.stages.len() as u32;
-        let binary_data_offset = (GRAPH_HEADER_LEN + self.stages.len() * GRAPH_STAGE_LEN) as u32;
+        // The firmware (LEON, SPARC) reads weights with word loads and traps on a misaligned address, so
+        // the weights must start aligned. 227-byte stage records only land aligned when nstages % 4 == 0.
+        let binary_data_offset = Self::align64(GRAPH_HEADER_LEN + self.stages.len() * GRAPH_STAGE_LEN) as u32;
         let total_size = (binary_data_offset as usize) + self.weights_blob.len();
 
         let mut blob = vec![0u8; total_size];
@@ -721,6 +723,20 @@ mod tests {
         assert_eq!(dg.stages[1].out_dim_y, 8);
         assert_eq!(dg.stages[1].out_dim_z, 64);
         assert_eq!(dg.stages[1].post_op, PostOp::Bias as u8);
+    }
+
+    #[test]
+    fn weights_start_aligned_for_any_stage_count() {
+        for nstages in 1..=5u32 {
+            let mut gb = GraphBuilder::new(12);
+            for _ in 0..nstages {
+                gb.add_input_data_stage(8, 8, 16);
+            }
+            let blob = gb.build().unwrap();
+            let off = u32::from_le_bytes(blob[244..248].try_into().unwrap());
+            assert_eq!(off % 64, 0, "{nstages} stages: weights at {off}");
+            assert_eq!(u32::from_le_bytes(blob[32..36].try_into().unwrap()) as usize, blob.len());
+        }
     }
 }
 

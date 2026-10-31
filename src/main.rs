@@ -323,6 +323,9 @@ fn main() -> Result<()> {
             }
 
             let mut gb = graph::GraphBuilder::new(shaves);
+            // The firmware expects the input-descriptor stage first, as every mvNCCompile graph has.
+            let (dim_x, dim_y) = graph::GraphBuilder::factor_spatial_dims(m);
+            gb.add_input_data_stage(dim_x, dim_y, k);
             gb.add_gemm_stage(
                 "shave_gemm",
                 m,
@@ -330,7 +333,7 @@ fn main() -> Result<()> {
                 n,
                 &w_f16,
                 Some(&b_f16),
-                if relu { graph::PostOp::Relu } else { graph::PostOp::None },
+                if relu { graph::PostOp::Relu } else { graph::PostOp::Bias },
                 graph::BufferRef {
                     offset: 0,
                     index: graph::BUFFER_INPUT,
