@@ -1,0 +1,6 @@
+movidius-rust
+The v1 device protocol implementation in src/v1.rs is an independent reimplementation, written from
+the wire behaviour documented by Intel's NCSDK v1 host sources (api/src/usb_link_vsc.c,
+api/src/mvnc_api.c, api/include/mvnc.h at tag v1.12.01.01), https://github.com/movidius/ncsdk,
+Copyright (c) 2017-2018 Intel Corporation, licensed under the Apache License 2.0. No source is copied.
+The device firmware (MvNCAPI.mvcmd) and the graph compiler are Intel's and are NOT distributed here.

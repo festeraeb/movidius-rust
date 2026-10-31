@@ -1,0 +1,14 @@
+[package]
+name = "movidius-rust"
+version = "0.3.0"
+edition = "2024"
+description = "Pure-Rust host for the Intel Movidius NCS1 (Myriad 2) using the NCSDK v1 device protocol, no OpenVINO / NCSDK host library"
+license = "Apache-2.0"
+
+[dependencies]
+anyhow = "1.0.104"
+clap = { version = "4.6.7", features = ["derive"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+rusb = "0.9.4"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }

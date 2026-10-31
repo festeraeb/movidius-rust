@@ -1,0 +1,9 @@
+/target
+daemon.log
+# Intel firmware and models must not be committed (see README.md for source and md5)
+firmware/*
+!firmware/README.md
+models/
+*.graph
+*.mvcmd
+*.caffemodel
